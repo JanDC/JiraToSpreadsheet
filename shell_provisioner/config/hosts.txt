@@ -1,0 +1,6 @@
+# Add a line to your hosts file.
+# This must match the values for GUEST_IP and APP_DOMAIN set in run.sh
+192.168.33.10 j2sp.dev
+192.168.33.10 phpmyadmin.j2sp.dev
+192.168.33.10 mailcatcher.j2sp.dev
+192.168.33.10 roundcube.j2sp.dev
