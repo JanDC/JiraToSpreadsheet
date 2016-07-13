@@ -2,8 +2,14 @@
 
 namespace AppBundle;
 
+use AppBundle\DependencyInjection\AppBundleExtension;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class AppBundle extends Bundle
 {
+    public function getContainerExtension()
+    {
+        return new AppBundleExtension();
+    }
 }

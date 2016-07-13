@@ -1,0 +1,7 @@
+services:
+  jira.loginService:
+    class: AppBundle\Services\LoginService
+    arguments: [%jira.server_endpoint%, "@session"]
+  jira.queryService:
+    class: AppBundle\Services\QueryService
+    arguments: ["@jira.loginService"]
