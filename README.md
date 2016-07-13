@@ -1,2 +1,2 @@
 # JiraToSpreadsheet
-Symfony sample app to parse JIRA overviews to csv
+Simple Symfony app to parse JIRA worklogs to a csv spreadsheet
