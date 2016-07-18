@@ -9,19 +9,24 @@ use chobie\Jira\Issues\Walker;
 
 class QueryService
 {
-    static private $category_map = [10205 => 'MEE'];
+    static private $category_map = [
+        'Analyse' => 'ANA',
+        'Design' => 'DES',
+        'Frontend/slicing' => 'FRO',
+        'Development' => 'DEV',
+        'Communicatie' => 'COM',
+        'Meetings' => 'MEE',
+        'Opleidingsmeetings' => 'OPL',
+        'Uitbreidingen' => 'EXT',
+        'Support' => 'SUP',
+        'Afwezigheid' => 'AFW',
+        'Intern werk' => 'INT',
+        'Project management & opvolging' => 'COM'
+    ];
 
     public function __construct(JiraLoginService $jiraLoginService)
     {
         $this->jiraLoginService = $jiraLoginService;
-    }
-
-    private static function mapCategoryToIdentifier($id)
-    {
-        if (!isset(self::$category_map[$id])) {
-            return $id;
-        }
-        return self::$category_map[$id];
     }
 
     public function getAllProjects()
@@ -73,7 +78,7 @@ class QueryService
                     'project' => $issue->getProject()['key'],
                     'date' => $creationDate->format('d-m-Y'),
                     'timestamp' => $creationDate->format('U'),
-                    'category' => self::mapCategoryToIdentifier($issue->getFields()['Category']['id']),
+                    'category' => self::mapCategoryToIdentifier($issue->getFields()['Category']['value']),
                     'time_spend_hours' => round($worklog['timeSpentSeconds'] / 3600, 2),
                     'comment' => "[{$issue->getKey()}] {$worklog['comment']}"
                 ];
@@ -88,6 +93,8 @@ class QueryService
 
             return $a['timestamp'] < $b['timestamp'] ? -1 : 1;
         });
+
+        $exportLines = $this->structureLines($exportLines);
 
         $header = join(',', array_keys(reset($exportLines))) . "\n";
         return $header . join("\n", array_map(function (array $exportLine) {
@@ -105,5 +112,37 @@ class QueryService
         return $this->jiraLoginService->getCurrentUser();
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
+    private static function mapCategoryToIdentifier($id)
+    {
+        if (is_null($id)) {
+            return 'DEV';
+        }
 
+        if (!isset(self::$category_map[$id])) {
+            return $id;
+        }
+
+        return self::$category_map[$id];
+    }
+
+    /**
+     * @param array $exportLines
+     * @return array
+     */
+    private function structureLines($exportLines)
+    {
+        $header = ['author' => 'Naam', 'project' => 'Project', 'date' => 'Datum', 'category' => 'Categorie', 'time_spend_hours' => 'Uren', '' => '', 'comment' => 'Opmerkingen'];
+
+        return
+            array_map(function ($exportline) use ($header) {
+                return array_combine(
+                    array_values($header),
+                    array_merge($header, array_intersect_key($exportline, $header))
+                );
+            }, $exportLines);
+    }
 }
