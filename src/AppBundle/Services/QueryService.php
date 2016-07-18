@@ -76,7 +76,7 @@ class QueryService
                 $exportLines[] = [
                     'author' => $worklog['author']['displayName'],
                     'project' => $issue->getProject()['key'],
-                    'date' => $creationDate->format('d-m-Y'),
+                    'date' => $creationDate->format('d/m/Y'),
                     'timestamp' => $creationDate->format('U'),
                     'category' => self::mapCategoryToIdentifier($issue->getFields()['Category']['value']),
                     'time_spend_hours' => round($worklog['timeSpentSeconds'] / 3600, 2),
@@ -90,7 +90,6 @@ class QueryService
             if ($a['timestamp'] == $b['timestamp']) {
                 return 0;
             }
-
             return $a['timestamp'] < $b['timestamp'] ? -1 : 1;
         });
 
