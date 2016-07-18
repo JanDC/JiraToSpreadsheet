@@ -5,13 +5,11 @@ namespace AppBundle\Controller;
 use AppBundle\Forms\FilterForm;
 use AppBundle\Forms\LoginForm;
 use AppBundle\Services\QueryService;
-use chobie\Jira\Api\Result;
 use chobie\Jira\Api\UnauthorizedException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 
 class DefaultController extends Controller
 {
@@ -65,7 +63,7 @@ class DefaultController extends Controller
             ]);
 
         } catch (UnauthorizedException $ue) {
-            return $this->redirect('login');
+            return $this->redirect($this->generateUrl('login'));
         }
 
         $result = [];
@@ -81,7 +79,7 @@ class DefaultController extends Controller
 
             return new Response($csvData, 200, [
                 'Content-Type' => 'text/csv',
-                'Content-disposition'=>'attachment;filename=BertLogs.csv'
+                'Content-disposition' => 'attachment;filename=BertLogs.csv'
             ]);
         }
 
