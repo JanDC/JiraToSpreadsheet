@@ -10,7 +10,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 
 class DefaultController extends Controller
 {
@@ -36,7 +35,6 @@ class DefaultController extends Controller
             } catch (UnauthorizedException $iae) {
                 $login_form->addError(new FormError('These credentials where rejected, please try again.'));
             }
-
         }
 
         return $this->render('AppBundle::default/login.html.twig', [
@@ -56,12 +54,7 @@ class DefaultController extends Controller
         /** @var QueryService $queryService */
         $queryService = $this->get('jira.queryService');
         try {
-            $recentProjects = $queryService->getRecentProjects(25);
-            $filterForm = $this->createForm(FilterForm::class, [], [
-                'data' => [
-                    'projectlist' => array_combine(array_column($recentProjects, 'name'), array_column($recentProjects, 'name'))
-                ]
-            ]);
+            $filterForm = $this->createForm(FilterForm::class);
 
         } catch (UnauthorizedException $ue) {
             return $this->redirect($this->generateUrl('login'));
@@ -73,7 +66,6 @@ class DefaultController extends Controller
             $filterForm->handleRequest($request);
 
             $csvData = $queryService->buildList(
-                $filterForm->get('project')->getData(),
                 $filterForm->get('fromdate')->getData(),
                 $filterForm->get('todate')->getData()
             );

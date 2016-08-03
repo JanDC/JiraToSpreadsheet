@@ -44,13 +44,10 @@ class QueryService
 
     }
 
-    public function buildList(array $projects, \DateTime $startDate, \DateTime $stopDate)
+    public function buildList(\DateTime $startDate, \DateTime $stopDate)
     {
         $walker = new Walker($this->jiraLoginService->getJiraApi());
-        $jqlString = sprintf("project IN (%s) AND worklogAuthor = currentUser() AND worklogDate > '%s' AND worklogDate < '%s'",
-            join(' , ', array_map(function ($projectname) {
-                return "'$projectname'";
-            }, $projects)),
+        $jqlString = sprintf("worklogAuthor = currentUser() AND worklogDate > '%s' AND worklogDate < '%s'",
             $startDate->format('Y-m-d'),
             $stopDate->format('Y-m-d')
         );
@@ -63,16 +60,18 @@ class QueryService
             /** @var Issue $issue */
             $worklogs = $this->getApi()->getWorklogs($issue->getKey(), [])->getResult();
 
-            foreach ($worklogs as $worklog) {
-                if (!is_array($worklog)) {
-                    continue;
-                }
-                $worklog = reset($worklog);
+
+            foreach ($worklogs['worklogs'] as $worklog) {
 
                 if ($worklog['updateAuthor']['name'] !== $this->getCurrentUser()) {
                     continue;
                 }
                 $creationDate = date_create_from_format('Y-m-d\TH:i:s\.\0\0\0P', $worklog['started']);
+
+                if ($creationDate < $startDate) {
+                    continue;
+                }
+
                 $exportLines[] = [
                     'author' => $worklog['updateAuthor']['displayName'],
                     'project' => $issue->getProject()['key'],
@@ -138,6 +137,10 @@ class QueryService
 
         return
             array_map(function ($exportline) use ($header) {
+                $exportline = array_map(function ($column) {
+                    return trim($column);
+                }, $exportline);
+
                 return array_combine(
                     array_values($header),
                     array_merge($header, array_intersect_key($exportline, $header))
