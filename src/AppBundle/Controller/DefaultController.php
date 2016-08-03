@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 class DefaultController extends Controller
 {
     /**
-     * @Route("/", name="login")
+     * @Symfony\Component\Routing\Annotation\Route("/", name="login")
      *
      * @param Request $request
      *
@@ -43,7 +43,7 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/overview", name="overview")
+     * @Symfony\Component\Routing\Annotation\Route("/overview", name="overview")
      *
      * @param Request $request
      *
