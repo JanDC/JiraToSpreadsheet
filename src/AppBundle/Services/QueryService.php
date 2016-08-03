@@ -69,12 +69,12 @@ class QueryService
                 }
                 $worklog = reset($worklog);
 
-                if ($worklog['author']['name'] !== $this->getCurrentUser()) {
+                if ($worklog['updateAuthor']['name'] !== $this->getCurrentUser()) {
                     continue;
                 }
-                $creationDate = date_create_from_format('Y-m-d\TH:i:s\.\0\0\0P', $worklog['created']);
+                $creationDate = date_create_from_format('Y-m-d\TH:i:s\.\0\0\0P', $worklog['started']);
                 $exportLines[] = [
-                    'author' => $worklog['author']['displayName'],
+                    'author' => $worklog['updateAuthor']['displayName'],
                     'project' => $issue->getProject()['key'],
                     'date' => $creationDate->format('d/m/Y'),
                     'timestamp' => $creationDate->format('U'),
