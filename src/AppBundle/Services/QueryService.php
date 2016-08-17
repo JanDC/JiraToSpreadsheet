@@ -74,7 +74,7 @@ class QueryService
 
                 $exportLines[] = [
                     'author' => $worklog['updateAuthor']['displayName'],
-                    'project' => $issue->getProject()['key'],
+                    'project' => $issue->getProject()['name'],
                     'date' => $creationDate->format('d/m/Y'),
                     'timestamp' => $creationDate->format('U'),
                     'category' => self::mapCategoryToIdentifier($issue->getFields()['Category']['value']),
