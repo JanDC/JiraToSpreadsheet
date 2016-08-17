@@ -96,7 +96,7 @@ class QueryService
 
         $header = join(',', array_keys(reset($exportLines))) . "\n";
         return $header . join("\n", array_map(function (array $exportLine) {
-            return join(' , ', $exportLine);
+            return join(',', $exportLine);
         }, $exportLines));
     }
 
