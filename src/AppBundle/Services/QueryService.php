@@ -71,7 +71,6 @@ class QueryService
                 if ($creationDate < $startDate) {
                     continue;
                 }
-
                 $exportLines[] = [
                     'author' => $worklog['updateAuthor']['displayName'],
                     'project' => $issue->getProject()['name'],
@@ -79,25 +78,23 @@ class QueryService
                     'timestamp' => $creationDate->format('U'),
                     'category' => self::mapCategoryToIdentifier($issue->getFields()['Category']['value']),
                     'time_spend_hours' => round($worklog['timeSpentSeconds'] / 3600, 2),
-                    'comment' => "[{$issue->getKey()}] {$worklog['comment']}"
+                    'comment' => "[{$issue->getKey()}] {$worklog['comment']}",
+                    "component" => reset($issue->get('Component/s'))['name'],
                 ];
             }
         }
 
         # Since JIRA doesn't support sorting on worklogdate, we have to.
         usort($exportLines, function ($a, $b) {
-            if ($a['timestamp'] == $b['timestamp']) {
-                return 0;
-            }
-            return $a['timestamp'] < $b['timestamp'] ? -1 : 1;
+            return $a['timestamp'] <=> $b['timestamp'];
         });
 
         $exportLines = $this->structureLines($exportLines);
 
         $header = join(',', array_keys(reset($exportLines))) . "\n";
         return $header . join("\n", array_map(function (array $exportLine) {
-            return join(',', $exportLine);
-        }, $exportLines));
+                return join(',', $exportLine);
+            }, $exportLines));
     }
 
     private function getApi()
@@ -133,7 +130,7 @@ class QueryService
      */
     private function structureLines($exportLines)
     {
-        $header = ['author' => 'Naam', 'project' => 'Project', 'date' => 'Datum', 'category' => 'Categorie', 'time_spend_hours' => 'Uren', '' => '', 'comment' => 'Opmerkingen'];
+        $header = ['author' => 'Naam', 'project' => 'Project', 'date' => 'Datum', 'category' => 'Categorie', 'time_spend_hours' => 'Uren', '' => '', 'comment' => 'Opmerkingen', 'component' => 'component'];
 
         return
             array_map(function ($exportline) use ($header) {
